@@ -14,6 +14,16 @@ class Board:
         BOARDMIN = 0
         return x >= BOARDMIN and x <= BOARDMAX and y >= BOARDMIN and y <= BOARDMAX
 
+    def movesInDirection(x, y, dx, dy):
+        moves = set()
+        x += dx
+        y += dy
+        while (Board.isInBoard(x,y)):
+            moves.add((x,y))
+            x += dx
+            y += dy
+        return moves
+
 class Bishop:
     def __init__(self, x, y):
         self.x = x
@@ -22,21 +32,11 @@ class Bishop:
     def validMoves(self):
         moves = set()
 
-        moves.update(self.__MovesInDirection(self.x, self.y, +1, +1))
-        moves.update(self.__MovesInDirection(self.x, self.y, +1, -1))
-        moves.update(self.__MovesInDirection(self.x, self.y, -1, +1))
-        moves.update(self.__MovesInDirection(self.x, self.y, -1, -1))
+        moves.update(Board.movesInDirection(self.x, self.y, +1, +1))
+        moves.update(Board.movesInDirection(self.x, self.y, +1, -1))
+        moves.update(Board.movesInDirection(self.x, self.y, -1, +1))
+        moves.update(Board.movesInDirection(self.x, self.y, -1, -1))
 
-        return moves
-
-    def __MovesInDirection(self, x, y, dx, dy):
-        moves = set()
-        x += dx
-        y += dy
-        while (Board.isInBoard(x,y)):
-            moves.add((x,y))
-            x += dx
-            y += dy
         return moves
 
 class Rook:
@@ -47,21 +47,11 @@ class Rook:
     def validMoves(self):
         moves = set()
 
-        moves.update(self.__MovesInDirection(self.x, self.y, +1, 0))
-        moves.update(self.__MovesInDirection(self.x, self.y, -1, 0))
-        moves.update(self.__MovesInDirection(self.x, self.y, 0, +1))
-        moves.update(self.__MovesInDirection(self.x, self.y, 0, -1))
+        moves.update(Board.movesInDirection(self.x, self.y, +1, 0))
+        moves.update(Board.movesInDirection(self.x, self.y, -1, 0))
+        moves.update(Board.movesInDirection(self.x, self.y, 0, +1))
+        moves.update(Board.movesInDirection(self.x, self.y, 0, -1))
 
-        return moves
-
-    def __MovesInDirection(self, x, y, dx, dy):
-        moves = set()
-        x += dx
-        y += dy
-        while (Board.isInBoard(x,y)):
-            moves.add((x,y))
-            x += dx
-            y += dy
         return moves
 
 class Tests(unittest.TestCase):
