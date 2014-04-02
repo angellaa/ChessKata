@@ -1,7 +1,9 @@
 import unittest
 from enum import Enum
 
-Colors = Enum('White', 'Black')
+class Colors(Enum):
+    White = 1
+    Black = 2
 
 class Cell:
     def __init__(self, x, y):
@@ -21,14 +23,23 @@ class Board:
         BOARDMIN = 0
         return x >= BOARDMIN and x <= BOARDMAX and y >= BOARDMIN and y <= BOARDMAX
 
-    def isUnoccupied(self, x, y):
-        return not any(piece.x == x and piece.y == y for piece in self.pieces)
+    def isOccupied(self, x, y):
+        return any(piece.x == x and piece.y == y for piece in self.pieces)
 
-    def movesInDirection(self, x, y, dx, dy):
+    def pieceAt(self, x, y):
+        for piece in self.pieces:
+            if (piece.x == x and piece.y == y):
+                return piece
+
+    def movesInDirection(self, x, y, dx, dy, color):
         moves = set()
         x += dx
         y += dy
-        while (Board.isInBoard(x,y) and self.isUnoccupied(x,y)):
+        while (Board.isInBoard(x,y)):
+            if (self.isOccupied(x,y)):                
+                if self.pieceAt(x, y).color != color:
+                    moves.add((x, y))
+                break
             moves.add((x,y))
             x += dx
             y += dy
@@ -38,16 +49,16 @@ class Piece:
     def __init__(self, x, y, color = Colors.Black):
         self.x = x
         self.y = y
-        color = color
+        self.color = color
 
 class Bishop(Piece):
     def validMoves(self, board):
         moves = set()
 
-        moves.update(board.movesInDirection(self.x, self.y, +1, +1))
-        moves.update(board.movesInDirection(self.x, self.y, +1, -1))
-        moves.update(board.movesInDirection(self.x, self.y, -1, +1))
-        moves.update(board.movesInDirection(self.x, self.y, -1, -1))
+        moves.update(board.movesInDirection(self.x, self.y, +1, +1, self.color))
+        moves.update(board.movesInDirection(self.x, self.y, +1, -1, self.color))
+        moves.update(board.movesInDirection(self.x, self.y, -1, +1, self.color))
+        moves.update(board.movesInDirection(self.x, self.y, -1, -1, self.color))
 
         return moves
 
@@ -55,10 +66,10 @@ class Rook(Piece):
     def validMoves(self, board):
         moves = set()
 
-        moves.update(board.movesInDirection(self.x, self.y, +1, 0))
-        moves.update(board.movesInDirection(self.x, self.y, -1, 0))
-        moves.update(board.movesInDirection(self.x, self.y, 0, +1))
-        moves.update(board.movesInDirection(self.x, self.y, 0, -1))
+        moves.update(board.movesInDirection(self.x, self.y, +1, 0, self.color))
+        moves.update(board.movesInDirection(self.x, self.y, -1, 0, self.color))
+        moves.update(board.movesInDirection(self.x, self.y, 0, +1, self.color))
+        moves.update(board.movesInDirection(self.x, self.y, 0, -1, self.color))
 
         return moves
 
@@ -93,6 +104,14 @@ class Tests(unittest.TestCase):
         board = Board(set([rook, bishop]))
         moves = rook.validMoves(board);
         expectedMoves = set([(0, 3), (1, 3), (2, 3), (4, 3), (3, 0), (3, 1), (3, 2), (3, 4), (3, 5), (3, 6), (3, 7)])
+        self.assertEqual(expectedMoves, moves)
+
+    def testRookMovesWithOpposingBishop(self):
+        rook = Rook(3, 3, Colors.Black)
+        bishop = Bishop(5, 3, Colors.White)
+        board = Board(set([rook, bishop]))
+        moves = rook.validMoves(board);
+        expectedMoves = set([(0, 3), (1, 3), (2, 3), (4, 3), (5, 3), (3, 0), (3, 1), (3, 2), (3, 4), (3, 5), (3, 6), (3, 7)])
         self.assertEqual(expectedMoves, moves)
 
     def testPointToString(self):
