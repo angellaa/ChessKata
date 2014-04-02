@@ -9,6 +9,9 @@ class Cell:
         return letters[self.x] + str(self.y + 1)
 
 class Board:
+    def __init__(self, pieces = set()):
+        self.pieces = pieces
+
     def isInBoard(x, y):
         BOARDMAX = 7
         BOARDMIN = 0
@@ -29,7 +32,7 @@ class Bishop:
         self.x = x
         self.y = y
 
-    def validMoves(self):
+    def validMoves(self, board):
         moves = set()
 
         moves.update(Board.movesInDirection(self.x, self.y, +1, +1))
@@ -44,7 +47,7 @@ class Rook:
         self.x = x
         self.y = y
 
-    def validMoves(self):
+    def validMoves(self, board):
         moves = set()
 
         moves.update(Board.movesInDirection(self.x, self.y, +1, 0))
@@ -63,21 +66,29 @@ class Tests(unittest.TestCase):
 
     def testWhereCanABishopMove(self):
         bishop = Bishop(3, 5)
-        calculatedMoves = bishop.validMoves();
+        calculatedMoves = bishop.validMoves(Board());
         expectedMoves = set([(2,4),(1,3),(0,2),(4,6),(5,7),(4,4),(5,3),(6,2),(7,1),(2,6),(1,7)])
         self.assertEqual(expectedMoves, calculatedMoves)
 
     def testWhereCanABishopInTheCornerMove(self):
         bishop = Bishop(0, 0)
-        calculatedMoves = bishop.validMoves();
+        calculatedMoves = bishop.validMoves(Board());
         expectedMoves = set([(1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (7, 7)])
         self.assertEqual(expectedMoves, calculatedMoves)
 
     def testWhereCanARookInTheCornerMove(self):
         rook = Rook(0, 0)
-        calculatedMoves = rook.validMoves();
+        calculatedMoves = rook.validMoves(Board());
         expectedMoves = set([(0, 1), (0, 2), (0, 3), (0, 4), (0, 5), (0, 6), (0, 7), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0), (7, 0)])
         self.assertEqual(expectedMoves, calculatedMoves)
+
+    def testRookMovesWithBishop(self):
+        rook = Rook(3, 3)
+        bishop = Bishop(5, 3)
+        board = Board(set([rook, bishop]))
+        moves = rook.validMoves(board);
+        expectedMoves = set([(0, 3), (1, 3), (2, 3), (4, 3), (3, 0), (3, 1), (3, 2), (3, 4), (3, 5), (3, 6), (3, 7)])
+        self.assertEqual(expectedMoves, moves)
 
     def testPointToString(self):
         cell = Cell(2,3)
