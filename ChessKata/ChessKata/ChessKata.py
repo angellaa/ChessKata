@@ -8,10 +8,10 @@ class Bishop:
     def validMoves(self):
         moves = set()
 
-        moves = moves.union(self.__MovesInDirection(self.x, self.y, +1, +1))
-        moves = moves.union(self.__MovesInDirection(self.x, self.y, +1, -1))
-        moves = moves.union(self.__MovesInDirection(self.x, self.y, -1, +1))
-        moves = moves.union(self.__MovesInDirection(self.x, self.y, -1, -1))
+        moves.update(self.__MovesInDirection(self.x, self.y, +1, +1))
+        moves.update(self.__MovesInDirection(self.x, self.y, +1, -1))
+        moves.update(self.__MovesInDirection(self.x, self.y, -1, +1))
+        moves.update(self.__MovesInDirection(self.x, self.y, -1, -1))
 
         return moves
 
