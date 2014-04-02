@@ -2,7 +2,9 @@ import unittest
 
 class Board:
     def isInBoard(x, y):
-        return x >= 0 and x <= 7 and y >= 0 and y <= 7
+        BOARDMAX = 7
+        BOARDMIN = 0
+        return x >= BOARDMIN and x <= BOARDMAX and y >= BOARDMIN and y <= BOARDMAX
 
 class Bishop:
     def __init__(self, x, y):
