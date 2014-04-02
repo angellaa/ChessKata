@@ -17,11 +17,14 @@ class Board:
         BOARDMIN = 0
         return x >= BOARDMIN and x <= BOARDMAX and y >= BOARDMIN and y <= BOARDMAX
 
-    def movesInDirection(x, y, dx, dy):
+    def isUnoccupied(self, x, y):
+        return pieces.Any(piece => piece.x == x and piece.y == y)
+
+    def movesInDirection(self, x, y, dx, dy):
         moves = set()
         x += dx
         y += dy
-        while (Board.isInBoard(x,y)):
+        while (Board.isInBoard(x,y) and self.isUnoccupied(x,y)):
             moves.add((x,y))
             x += dx
             y += dy
@@ -35,10 +38,10 @@ class Bishop:
     def validMoves(self, board):
         moves = set()
 
-        moves.update(Board.movesInDirection(self.x, self.y, +1, +1))
-        moves.update(Board.movesInDirection(self.x, self.y, +1, -1))
-        moves.update(Board.movesInDirection(self.x, self.y, -1, +1))
-        moves.update(Board.movesInDirection(self.x, self.y, -1, -1))
+        moves.update(board.movesInDirection(self.x, self.y, +1, +1))
+        moves.update(board.movesInDirection(self.x, self.y, +1, -1))
+        moves.update(board.movesInDirection(self.x, self.y, -1, +1))
+        moves.update(board.movesInDirection(self.x, self.y, -1, -1))
 
         return moves
 
@@ -50,10 +53,10 @@ class Rook:
     def validMoves(self, board):
         moves = set()
 
-        moves.update(Board.movesInDirection(self.x, self.y, +1, 0))
-        moves.update(Board.movesInDirection(self.x, self.y, -1, 0))
-        moves.update(Board.movesInDirection(self.x, self.y, 0, +1))
-        moves.update(Board.movesInDirection(self.x, self.y, 0, -1))
+        moves.update(board.movesInDirection(self.x, self.y, +1, 0))
+        moves.update(board.movesInDirection(self.x, self.y, -1, 0))
+        moves.update(board.movesInDirection(self.x, self.y, 0, +1))
+        moves.update(board.movesInDirection(self.x, self.y, 0, -1))
 
         return moves
 
