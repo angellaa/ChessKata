@@ -7,7 +7,7 @@ class Bishop:
 
 class Tests(unittest.TestCase):
 
-    def test(self):
+    def testPlaceBishopSomewhere(self):
         bishop = Bishop(3, 5)
         self.assertEqual(3, bishop.x)
         self.assertEqual(5, bishop.y)
