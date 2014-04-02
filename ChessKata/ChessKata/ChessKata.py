@@ -73,6 +73,16 @@ class Rook(Piece):
 
         return moves
 
+class Queen(Piece):
+    def validMoves(self, board):
+        moves = set()
+
+        moves.update(Rook(self.x, self.y, board).validMoves(board))
+        moves.update(Bishop(self.x, self.y, board).validMoves(board))
+
+        return moves
+
+
 class Tests(unittest.TestCase):
     
     def testPlaceBishopSomewhere(self):
@@ -112,6 +122,14 @@ class Tests(unittest.TestCase):
         board = Board(set([rook, bishop]))
         moves = rook.validMoves(board);
         expectedMoves = set([(0, 3), (1, 3), (2, 3), (4, 3), (5, 3), (3, 0), (3, 1), (3, 2), (3, 4), (3, 5), (3, 6), (3, 7)])
+        self.assertEqual(expectedMoves, moves)
+
+    def testQueenMoves(self):
+        queen = Queen(0, 0)
+        moves = queen.validMoves(Board());
+        expectedMoves = set([(0, 1), (0, 2), (0, 3), (0, 4), (0, 5), (0, 6), (0, 7), 
+                             (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0), (7, 0),
+                             (1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (7, 7)])
         self.assertEqual(expectedMoves, moves)
 
     def testPointToString(self):
