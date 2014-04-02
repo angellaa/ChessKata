@@ -5,15 +5,6 @@ class Colors(Enum):
     White = 1
     Black = 2
 
-class Cell:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-
-    def __str__(self):
-        letters = "abcdefgh"
-        return letters[self.x] + str(self.y + 1)
-
 class Board:
     def __init__(self, pieces = set()):
         self.pieces = pieces
@@ -158,10 +149,6 @@ class Tests(unittest.TestCase):
         moves = knight.validMoves(Board());
         expectedMoves = set([(5,6), (4,7), (1,4), (2,3), (5,4), (4,3), (1,6), (2,7),])
         self.assertEqual(expectedMoves, moves)
-
-    def testPointToString(self):
-        cell = Cell(2,3)
-        self.assertEqual("c4", str(cell))
 
 if __name__ == '__main__':
     unittest.main()
