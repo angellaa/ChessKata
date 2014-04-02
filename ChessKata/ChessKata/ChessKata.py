@@ -1,4 +1,12 @@
 import unittest
+class Cell:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __str__(self):
+        letters = "abcdefgh"
+        return letters[self.x] + str(self.y + 1)
 
 class Board:
     def isInBoard(x, y):
@@ -49,6 +57,10 @@ class Tests(unittest.TestCase):
         calculatedMoves = bishop.validMoves();
         expectedMoves = set([(1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (7, 7)])
         self.assertEqual(expectedMoves, calculatedMoves)
+
+    def testPointToString(self):
+        cell = Cell(2,3)
+        self.assertEqual("c4", str(cell))
 
 if __name__ == '__main__':
     unittest.main()
