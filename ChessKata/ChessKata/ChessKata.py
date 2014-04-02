@@ -6,7 +6,24 @@ class Bishop:
         self.y = y
 
     def validMoves(self):
-        return set([(2,4),(1,3),(0,2),(4,6),(5,7),(4,4),(5,3),(6,2),(7,1),(2,6),(1,7)])
+        moves = set()
+
+        moves = moves.union(self.__MovesInDirection(self.x, self.y, +1, +1))
+        moves = moves.union(self.__MovesInDirection(self.x, self.y, +1, -1))
+        moves = moves.union(self.__MovesInDirection(self.x, self.y, -1, +1))
+        moves = moves.union(self.__MovesInDirection(self.x, self.y, -1, -1))
+
+        return moves
+
+    def __MovesInDirection(self, x, y, dx, dy):
+        moves = set()
+        x += dx
+        y += dy
+        while (x >= 0 and x <= 7 and y >= 0 and y <= 7):
+            moves.add((x,y))
+            x += dx
+            y += dy
+        return moves
 
 class Tests(unittest.TestCase):
     
@@ -19,6 +36,12 @@ class Tests(unittest.TestCase):
         bishop = Bishop(3, 5)
         calculatedMoves = bishop.validMoves();
         expectedMoves = set([(2,4),(1,3),(0,2),(4,6),(5,7),(4,4),(5,3),(6,2),(7,1),(2,6),(1,7)])
+        self.assertEqual(expectedMoves, calculatedMoves)
+
+    def testWhereCanABishopInTheCornerMove(self):
+        bishop = Bishop(0, 0)
+        calculatedMoves = bishop.validMoves();
+        expectedMoves = set([(1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (7, 7)])
         self.assertEqual(expectedMoves, calculatedMoves)
 
 if __name__ == '__main__':
