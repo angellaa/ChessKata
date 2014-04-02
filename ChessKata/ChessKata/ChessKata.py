@@ -18,7 +18,7 @@ class Board:
         return x >= BOARDMIN and x <= BOARDMAX and y >= BOARDMIN and y <= BOARDMAX
 
     def isUnoccupied(self, x, y):
-        return pieces.Any(piece => piece.x == x and piece.y == y)
+        return not any(piece.x == x and piece.y == y for piece in self.pieces)
 
     def movesInDirection(self, x, y, dx, dy):
         moves = set()
