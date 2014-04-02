@@ -91,14 +91,10 @@ class Knight(Piece):
     def validMoves(self, board):
         moves = set()
 
-        moves.update(board.singleMoveInDirection(self.x, self.y, +1, +2, self.color))
-        moves.update(board.singleMoveInDirection(self.x, self.y, +1, -2, self.color))
-        moves.update(board.singleMoveInDirection(self.x, self.y, -1, +2, self.color))
-        moves.update(board.singleMoveInDirection(self.x, self.y, -1, -2, self.color))
-        moves.update(board.singleMoveInDirection(self.x, self.y, +2, +1, self.color))
-        moves.update(board.singleMoveInDirection(self.x, self.y, +2, -1, self.color))
-        moves.update(board.singleMoveInDirection(self.x, self.y, -2, +1, self.color))
-        moves.update(board.singleMoveInDirection(self.x, self.y, -2, -1, self.color))
+        for one in [-1, +1]:
+            for two in [-2, +2]:
+                moves.update(board.singleMoveInDirection(self.x, self.y, one, two, self.color))
+                moves.update(board.singleMoveInDirection(self.x, self.y, two, one, self.color))
 
         return moves
 
