@@ -1,4 +1,8 @@
 import unittest
+from enum import Enum
+
+Colors = Enum('White', 'Black')
+
 class Cell:
     def __init__(self, x, y):
         self.x = x
@@ -30,11 +34,13 @@ class Board:
             y += dy
         return moves
 
-class Bishop:
-    def __init__(self, x, y):
+class Piece:
+    def __init__(self, x, y, color = Colors.Black):
         self.x = x
         self.y = y
+        color = color
 
+class Bishop(Piece):
     def validMoves(self, board):
         moves = set()
 
@@ -45,11 +51,7 @@ class Bishop:
 
         return moves
 
-class Rook:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-
+class Rook(Piece):
     def validMoves(self, board):
         moves = set()
 
