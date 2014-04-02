@@ -45,6 +45,9 @@ class Board:
             y += dy
         return moves
 
+    def singleMoveInDirection(self, x, y, dx, dy, color):
+        return (x + dx, y + dy)
+
 class Piece:
     def __init__(self, x, y, color = Colors.Black):
         self.x = x
@@ -82,6 +85,14 @@ class Queen(Piece):
 
         return moves
 
+class Knight(Piece):
+    def validMoves(self, board):
+        moves = set()
+
+        moves.add(board.singleMoveInDirection(self.x, self.y, +1, +2, self.color))
+        moves.add(board.singleMoveInDirection(self.x, self.y, +2, +1, self.color))
+
+        return moves
 
 class Tests(unittest.TestCase):
     
@@ -130,6 +141,12 @@ class Tests(unittest.TestCase):
         expectedMoves = set([(0, 1), (0, 2), (0, 3), (0, 4), (0, 5), (0, 6), (0, 7), 
                              (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0), (7, 0),
                              (1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (7, 7)])
+        self.assertEqual(expectedMoves, moves)
+
+    def testKnightMoves(self):
+        knight = Knight(0, 0)
+        moves = knight.validMoves(Board());
+        expectedMoves = set([(2,1), (1,2)])
         self.assertEqual(expectedMoves, moves)
 
     def testPointToString(self):
