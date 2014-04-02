@@ -17,7 +17,7 @@ class Board:
     def isOccupied(self, x, y):
         return any(piece.x == x and piece.y == y for piece in self.pieces)
 
-    def pieceAt(self, x, y):
+    def __pieceAt(self, x, y):
         for piece in self.pieces:
             if (piece.x == x and piece.y == y):
                 return piece
@@ -28,7 +28,7 @@ class Board:
         y += dy
         while (Board.isInBoard(x,y)):
             if (self.isOccupied(x,y)):                
-                if self.pieceAt(x, y).color != color:
+                if self.__pieceAt(x, y).color != color:
                     moves.add((x, y))
                 break
             moves.add((x,y))
@@ -149,6 +149,9 @@ class Tests(unittest.TestCase):
         moves = knight.validMoves(Board());
         expectedMoves = set([(5,6), (4,7), (1,4), (2,3), (5,4), (4,3), (1,6), (2,7),])
         self.assertEqual(expectedMoves, moves)
+
+        #TODO knight blocked by same colour
+        #TODO remaining pieces
 
 if __name__ == '__main__':
     unittest.main()
