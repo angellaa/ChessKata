@@ -1,5 +1,9 @@
 import unittest
 
+class Board:
+    def isInBoard(x, y):
+        return x >= 0 and x <= 7 and y >= 0 and y <= 7
+
 class Bishop:
     def __init__(self, x, y):
         self.x = x
@@ -19,7 +23,7 @@ class Bishop:
         moves = set()
         x += dx
         y += dy
-        while (x >= 0 and x <= 7 and y >= 0 and y <= 7):
+        while (Board.isInBoard(x,y)):
             moves.add((x,y))
             x += dx
             y += dy
