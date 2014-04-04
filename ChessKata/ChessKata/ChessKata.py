@@ -30,8 +30,8 @@ class Board:
         x += dx
         y += dy
         while (Board.isInBoard(x,y)):
-            if (self.isOccupied(x,y)):                
-                if self.__pieceAt(x, y).color != color:
+            if (self.isOccupied(x,y)):
+                if self.__emptyOrCanTake(x, y, color):
                     moves.add((x, y))
                 break
             moves.add((x,y))
