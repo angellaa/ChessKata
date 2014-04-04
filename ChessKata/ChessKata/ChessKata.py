@@ -25,6 +25,9 @@ class Board:
     def __emptyOrCanTake(self, x, y, color):
         return Board.isInBoard(x, y) and not (self.isOccupied(x, y) and self.__pieceAt(x,y).color == color)
 
+    def canTake(self, x, y, color):
+        return self.isOccupied(x, y) and self.__pieceAt(x,y).color != color
+
     def movesInDirection(self, x, y, dx, dy, color):
         moves = set()
         x += dx
@@ -103,6 +106,9 @@ class Pawn(Piece):
             moves.add((self.x, self.y + dy))
             if self.y == startRank and not board.isOccupied(self.x, self.y + 2 * dy):
                 moves.add((self.x, self.y + 2 * dy))
+        for dx in [-1, +1]:
+            if board.canTake(self.x + dx, self.y + dy, self.color):
+                moves.add((self.x + dx, self.y + dy))
         return moves
 
 class Tests(unittest.TestCase):
@@ -218,7 +224,14 @@ class Tests(unittest.TestCase):
         expectedMoves = set()
         self.assertEqual(expectedMoves, moves)
 
-        # TODO pawn taking, en passant
+    def testPawnTakesRook(self):
+        pawn = Pawn(3, 3, Colors.White)
+        rook = Rook(4, 4, Colors.Black)
+        moves = pawn.validMoves(Board(set([pawn, rook])))
+        expectedMoves = set([(3, 4), (4, 4)])
+        self.assertEqual(expectedMoves, moves)
+        
+        # TODO en passant
         # TODO king, castling, check
 
 if __name__ == '__main__':
