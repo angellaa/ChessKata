@@ -252,10 +252,17 @@ class Tests(unittest.TestCase):
         expectedMoves = set([(3, 5), (4, 5)])
         self.assertEqual(expectedMoves, moves)
         
-    def basicKingMove(self):
+    def testBasicKingMove(self):
         king = King(0, 0)
         moves = king.validMoves(Board())
         expectedMoves = set([(0, 1), (1, 0), (1, 1)])
+        self.assertEqual(expectedMoves, moves)
+
+    def testCastling(self):
+        king = King(4, 0, Colors.White)
+        rook = Rook(0, 0, Colors.White)
+        moves = king.validMoves(Board(set([king, rook])))
+        expectedMoves = set([(3,0),(5,0),(3,1),(5,1),(4,1),(2,0)])
         self.assertEqual(expectedMoves, moves)
         
         # TODO castling, check
