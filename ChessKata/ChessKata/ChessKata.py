@@ -6,8 +6,9 @@ class Colors(Enum):
     Black = 2
 
 class Board:
-    def __init__(self, pieces = set()):
+    def __init__(self, pieces = set(), enPassantTarget = [-1, -1]):
         self.pieces = pieces
+        self.enPassantTarget = enPassantTarget
 
     def isInBoard(x, y):
         BOARDMAX = 7
@@ -22,13 +23,19 @@ class Board:
             if (piece.x == x and piece.y == y):
                 return piece
 
+    def __emptyOrCanTake(self, x, y, color):
+        return Board.isInBoard(x, y) and not (self.isOccupied(x, y) and self.__pieceAt(x,y).color == color)
+
+    def canTake(self, x, y, color):
+        return self.isOccupied(x, y) and self.__pieceAt(x,y).color != color
+
     def movesInDirection(self, x, y, dx, dy, color):
         moves = set()
         x += dx
         y += dy
         while (Board.isInBoard(x,y)):
-            if (self.isOccupied(x,y)):                
-                if self.__pieceAt(x, y).color != color:
+            if (self.isOccupied(x,y)):
+                if self.__emptyOrCanTake(x, y, color):
                     moves.add((x, y))
                 break
             moves.add((x,y))
@@ -37,8 +44,10 @@ class Board:
         return moves
 
     def singleMoveInDirection(self, x, y, dx, dy, color):
-        if Board.isInBoard(x + dx, y + dy):
-            return set([(x + dx, y + dy)])
+        x = x + dx
+        y = y + dy
+        if self.__emptyOrCanTake(x, y, color):
+            return set([(x, y)])
         return set()
 
 class Piece:
@@ -88,6 +97,33 @@ class Knight(Piece):
                 moves.update(board.singleMoveInDirection(self.x, self.y, two, one, self.color))
 
         return moves
+
+class Pawn(Piece):
+    def validMoves(self, board):
+        startRank = {Colors.White:1, Colors.Black:6}.get(self.color)
+        dy = {Colors.White:+1, Colors.Black:-1}.get(self.color)
+        moves = set()
+        if not board.isOccupied(self.x, self.y + dy):
+            moves.add((self.x, self.y + dy))
+            if self.y == startRank and not board.isOccupied(self.x, self.y + 2 * dy):
+                moves.add((self.x, self.y + 2 * dy))
+        for dx in [-1, +1]:
+            if board.canTake(self.x + dx, self.y + dy, self.color) or board.enPassantTarget == (self.x + dx, self.y + dy):
+                moves.add((self.x + dx, self.y + dy))
+        return moves
+
+class King(Piece):
+    def validMoves(self, board):
+        moves = set()
+
+        for one in [-1, +1]:
+            moves.update(board.singleMoveInDirection(self.x, self.y, one, 0, self.color))
+            moves.update(board.singleMoveInDirection(self.x, self.y, 0, one, self.color))
+            for two in [-1, +1]:
+                moves.update(board.singleMoveInDirection(self.x, self.y, two, one, self.color))
+
+        return moves
+
 
 class Tests(unittest.TestCase):
     
@@ -150,8 +186,92 @@ class Tests(unittest.TestCase):
         expectedMoves = set([(5,6), (4,7), (1,4), (2,3), (5,4), (4,3), (1,6), (2,7),])
         self.assertEqual(expectedMoves, moves)
 
-        #TODO knight blocked by same colour
-        #TODO remaining pieces
+    def testKnightMovesWithBlockingPiece(self):
+        knight = Knight(0, 0)
+        rook = Rook(1,2)
+        moves = knight.validMoves(Board(set([knight, rook])));
+        expectedMoves = set([(2,1)])
+        self.assertEqual(expectedMoves, moves)
+
+    def testKnightTakesRook(self):
+        knight = Knight(0, 0, Colors.Black)
+        rook = Rook(1,2, Colors.White)
+        moves = knight.validMoves(Board(set([knight, rook])));
+        expectedMoves = set([(2,1), (1,2)])
+        self.assertEqual(expectedMoves, moves)
+
+    def testWhitePawnMovesUp(self):
+        pawn = Pawn(3, 3, Colors.White)
+        moves = pawn.validMoves(Board())
+        expectedMoves = set([(3, 4)])
+        self.assertEqual(expectedMoves, moves)
+
+    def testBlackPawnMovesDown(self):
+        pawn = Pawn(3, 3, Colors.Black)
+        moves = pawn.validMoves(Board())
+        expectedMoves = set([(3, 2)])
+        self.assertEqual(expectedMoves, moves)
+
+    def testWhitePawnBlocked(self):
+        pawn = Pawn(3, 3, Colors.White)
+        rook = Rook(3, 4, Colors.Black)
+        moves = pawn.validMoves(Board(set([pawn, rook])))
+        expectedMoves = set()
+        self.assertEqual(expectedMoves, moves)
+
+    def testPawnChargeToRank4(self):
+        pawn = Pawn(3, 1, Colors.White)
+        moves = pawn.validMoves(Board())
+        expectedMoves = set([(3, 2), (3, 3)])
+        self.assertEqual(expectedMoves, moves)
+
+    def testBlackPawnCharge(self):
+        pawn = Pawn(3, 6, Colors.Black)
+        moves = pawn.validMoves(Board())
+        expectedMoves = set([(3, 5), (3, 4)])
+        self.assertEqual(expectedMoves, moves)
+
+    def testPawnCannotChargeToRank4IfBlocked(self):
+        pawn = Pawn(3, 1, Colors.White)
+        rook = Rook(3, 2, Colors.Black)
+        moves = pawn.validMoves(Board(set([pawn, rook])))
+        expectedMoves = set()
+        self.assertEqual(expectedMoves, moves)
+
+    def testPawnTakesRook(self):
+        pawn = Pawn(3, 3, Colors.White)
+        rook = Rook(4, 4, Colors.Black)
+        moves = pawn.validMoves(Board(set([pawn, rook])))
+        expectedMoves = set([(3, 4), (4, 4)])
+        self.assertEqual(expectedMoves, moves)
+
+    def testEnPassant(self):
+        pawn = Pawn(3, 4, Colors.White)
+        target = (4, 5)
+        moves = pawn.validMoves(Board(set(), target))
+        expectedMoves = set([(3, 5), (4, 5)])
+        self.assertEqual(expectedMoves, moves)
+        
+    def testBasicKingMove(self):
+        king = King(0, 0)
+        moves = king.validMoves(Board())
+        expectedMoves = set([(0, 1), (1, 0), (1, 1)])
+        self.assertEqual(expectedMoves, moves)
+
+    def testCastling(self):
+        king = King(4, 0, Colors.White)
+        rook = Rook(0, 0, Colors.White)
+        moves = king.validMoves(Board(set([king, rook])))
+        expectedMoves = set([(3,0),(5,0),(3,1),(5,1),(4,1),(2,0)])
+        self.assertEqual(expectedMoves, moves)
+        
+    def testCheck(self):
+        whiteKing = King(0, 0, Colors.White)
+        blackKing = King(0, 2, Colors.Black)
+        moves = whiteKing.validMoves(Board(set([whiteKing, blackKing])))
+        expectedMoves = set([(1, 0)])
+        self.assertEqual(expectedMoves, moves)
+
 
 if __name__ == '__main__':
     unittest.main()
