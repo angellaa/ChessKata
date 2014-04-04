@@ -39,7 +39,7 @@ class Board:
     def singleMoveInDirection(self, x, y, dx, dy, color):
         x = x + dx
         y = y + dy
-        if Board.isInBoard(x, y) and not self.isOccupied(x, y):
+        if Board.isInBoard(x, y) and (not self.isOccupied(x, y) or self.__pieceAt(x,y).color != color):
             return set([(x, y)])
         return set()
 
@@ -159,7 +159,13 @@ class Tests(unittest.TestCase):
         expectedMoves = set([(2,1)])
         self.assertEqual(expectedMoves, moves)
 
-        #TODO remaining pieces
+
+    def testKnightTakesRook(self):
+        knight = Knight(0, 0, Colors.Black)
+        rook = Rook(1,2, Colors.White)
+        moves = knight.validMoves(Board(set([knight, rook])));
+        expectedMoves = set([(2,1), (1,2)])
+        self.assertEqual(expectedMoves, moves)        #TODO remaining pieces
 
 if __name__ == '__main__':
     unittest.main()
