@@ -112,6 +112,19 @@ class Pawn(Piece):
                 moves.add((self.x + dx, self.y + dy))
         return moves
 
+class King(Piece):
+    def validMoves(self, board):
+        moves = set()
+
+        for one in [-1, +1]:
+            moves.update(board.singleMoveInDirection(self.x, self.y, one, 0, self.color))
+            moves.update(board.singleMoveInDirection(self.x, self.y, 0, one, self.color))
+            for two in [-1, +1]:
+                moves.update(board.singleMoveInDirection(self.x, self.y, two, one, self.color))
+
+        return moves
+
+
 class Tests(unittest.TestCase):
     
     def testPlaceBishopSomewhere(self):
@@ -239,7 +252,13 @@ class Tests(unittest.TestCase):
         expectedMoves = set([(3, 5), (4, 5)])
         self.assertEqual(expectedMoves, moves)
         
-        # TODO king, castling, check
+    def basicKingMove(self):
+        king = King(0, 0)
+        moves = king.validMoves(Board())
+        expectedMoves = set([(0, 1), (1, 0), (1, 1)])
+        self.assertEqual(expectedMoves, moves)
+        
+        # TODO castling, check
 
 if __name__ == '__main__':
     unittest.main()
