@@ -94,6 +94,14 @@ class Knight(Piece):
 
         return moves
 
+class Pawn(Piece):
+    def validMoves(self, board):
+        y = self.y + {Colors.White:+1, Colors.Black:-1}.get(self.color)
+        moves = set()
+        if not board.isOccupied(self.x, y):
+            moves.add((self.x, y))
+        return moves
+
 class Tests(unittest.TestCase):
     
     def testPlaceBishopSomewhere(self):
@@ -162,13 +170,34 @@ class Tests(unittest.TestCase):
         expectedMoves = set([(2,1)])
         self.assertEqual(expectedMoves, moves)
 
-
     def testKnightTakesRook(self):
         knight = Knight(0, 0, Colors.Black)
         rook = Rook(1,2, Colors.White)
         moves = knight.validMoves(Board(set([knight, rook])));
         expectedMoves = set([(2,1), (1,2)])
-        self.assertEqual(expectedMoves, moves)        #TODO remaining pieces
+        self.assertEqual(expectedMoves, moves)
+
+    def testWhitePawnMovesUp(self):
+        pawn = Pawn(3, 3, Colors.White)
+        moves = pawn.validMoves(Board())
+        expectedMoves = set([(3, 4)])
+        self.assertEqual(expectedMoves, moves)
+
+    def testBlackPawnMovesDown(self):
+        pawn = Pawn(3, 3, Colors.Black)
+        moves = pawn.validMoves(Board())
+        expectedMoves = set([(3, 2)])
+        self.assertEqual(expectedMoves, moves)
+
+    def testWhitePawnBlocked(self):
+        pawn = Pawn(3, 3, Colors.White)
+        rook = Rook(3, 4, Colors.Black)
+        moves = pawn.validMoves(Board(set([pawn, rook])))
+        expectedMoves = set()
+        self.assertEqual(expectedMoves, moves)
+
+        # TODO pawn taking, en passant, charge to rank 4
+        # TODO king, castling, check
 
 if __name__ == '__main__':
     unittest.main()
