@@ -6,8 +6,9 @@ class Colors(Enum):
     Black = 2
 
 class Board:
-    def __init__(self, pieces = set()):
+    def __init__(self, pieces = set(), enPassantTarget = [-1, -1]):
         self.pieces = pieces
+        self.enPassantTarget = enPassantTarget
 
     def isInBoard(x, y):
         BOARDMAX = 7
@@ -107,7 +108,7 @@ class Pawn(Piece):
             if self.y == startRank and not board.isOccupied(self.x, self.y + 2 * dy):
                 moves.add((self.x, self.y + 2 * dy))
         for dx in [-1, +1]:
-            if board.canTake(self.x + dx, self.y + dy, self.color):
+            if board.canTake(self.x + dx, self.y + dy, self.color) or board.enPassantTarget == (self.x + dx, self.y + dy):
                 moves.add((self.x + dx, self.y + dy))
         return moves
 
@@ -230,8 +231,14 @@ class Tests(unittest.TestCase):
         moves = pawn.validMoves(Board(set([pawn, rook])))
         expectedMoves = set([(3, 4), (4, 4)])
         self.assertEqual(expectedMoves, moves)
+
+    def testEnPassant(self):
+        pawn = Pawn(3, 4, Colors.White)
+        target = (4, 5)
+        moves = pawn.validMoves(Board(set(), target))
+        expectedMoves = set([(3, 5), (4, 5)])
+        self.assertEqual(expectedMoves, moves)
         
-        # TODO en passant
         # TODO king, castling, check
 
 if __name__ == '__main__':
