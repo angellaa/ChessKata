@@ -265,7 +265,13 @@ class Tests(unittest.TestCase):
         expectedMoves = set([(3,0),(5,0),(3,1),(5,1),(4,1),(2,0)])
         self.assertEqual(expectedMoves, moves)
         
-        # TODO castling, check
+    def testCheck(self):
+        whiteKing = King(0, 0, Colors.White)
+        blackKing = King(0, 2, Colors.Black)
+        moves = whiteKing.validMoves(Board(set([whiteKing, blackKing])))
+        expectedMoves = set([(1, 0)])
+        self.assertEqual(expectedMoves, moves)
+
 
 if __name__ == '__main__':
     unittest.main()
