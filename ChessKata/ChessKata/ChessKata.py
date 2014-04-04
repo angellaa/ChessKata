@@ -96,10 +96,13 @@ class Knight(Piece):
 
 class Pawn(Piece):
     def validMoves(self, board):
-        y = self.y + {Colors.White:+1, Colors.Black:-1}.get(self.color)
+        startRank = {Colors.White:1, Colors.Black:6}.get(self.color)
+        dy = {Colors.White:+1, Colors.Black:-1}.get(self.color)
         moves = set()
-        if not board.isOccupied(self.x, y):
-            moves.add((self.x, y))
+        if not board.isOccupied(self.x, self.y + dy):
+            moves.add((self.x, self.y + dy))
+            if self.y == startRank and not board.isOccupied(self.x, self.y + 2 * dy):
+                moves.add((self.x, self.y + 2 * dy))
         return moves
 
 class Tests(unittest.TestCase):
@@ -196,7 +199,26 @@ class Tests(unittest.TestCase):
         expectedMoves = set()
         self.assertEqual(expectedMoves, moves)
 
-        # TODO pawn taking, en passant, charge to rank 4
+    def testPawnChargeToRank4(self):
+        pawn = Pawn(3, 1, Colors.White)
+        moves = pawn.validMoves(Board())
+        expectedMoves = set([(3, 2), (3, 3)])
+        self.assertEqual(expectedMoves, moves)
+
+    def testBlackPawnCharge(self):
+        pawn = Pawn(3, 6, Colors.Black)
+        moves = pawn.validMoves(Board())
+        expectedMoves = set([(3, 5), (3, 4)])
+        self.assertEqual(expectedMoves, moves)
+
+    def testPawnCannotChargeToRank4IfBlocked(self):
+        pawn = Pawn(3, 1, Colors.White)
+        rook = Rook(3, 2, Colors.Black)
+        moves = pawn.validMoves(Board(set([pawn, rook])))
+        expectedMoves = set()
+        self.assertEqual(expectedMoves, moves)
+
+        # TODO pawn taking, en passant
         # TODO king, castling, check
 
 if __name__ == '__main__':
