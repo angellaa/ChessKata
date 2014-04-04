@@ -22,6 +22,9 @@ class Board:
             if (piece.x == x and piece.y == y):
                 return piece
 
+    def __emptyOrCanTake(self, x, y, color):
+        return Board.isInBoard(x, y) and not (self.isOccupied(x, y) and self.__pieceAt(x,y).color == color)
+
     def movesInDirection(self, x, y, dx, dy, color):
         moves = set()
         x += dx
@@ -39,7 +42,7 @@ class Board:
     def singleMoveInDirection(self, x, y, dx, dy, color):
         x = x + dx
         y = y + dy
-        if Board.isInBoard(x, y) and (not self.isOccupied(x, y) or self.__pieceAt(x,y).color != color):
+        if self.__emptyOrCanTake(x, y, color):
             return set([(x, y)])
         return set()
 
